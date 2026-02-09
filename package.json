@@ -1,0 +1,20 @@
+{
+  "name": "mobile-simple-market",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "client",
+    "server",
+    "shared"
+  ],
+  "scripts": {
+    "postinstall": "npm --workspace shared run build && npm --workspace server run prisma:generate",
+    "db:push": "npm --workspace server run prisma:push",
+    "dev": "npm --workspace shared run build && npm run db:push && concurrently \"npm --workspace server run dev\" \"npm --workspace client run dev\"",
+    "build": "npm --workspace shared run build && npm --workspace client run build && npm --workspace server run build",
+    "start": "npm run db:push && npm --workspace server run start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

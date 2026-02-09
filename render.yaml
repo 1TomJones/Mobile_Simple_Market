@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: mobile-simple-market
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: ADMIN_PIN
+        sync: false

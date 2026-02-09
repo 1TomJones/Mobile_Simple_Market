@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Room {
+  id         String   @id @default(cuid())
+  code       String   @unique
+  password   String?
+  users      User[]
+  trades     Trade[]
+  events     EventLog[]
+  snapshots  LeaderboardSnapshot[]
+  createdAt  DateTime @default(now())
+}
+
+model User {
+  id          String      @id @default(cuid())
+  roomId      String
+  room        Room        @relation(fields: [roomId], references: [id])
+  username    String
+  cash        Float       @default(10000)
+  realizedPnl Float       @default(0)
+  positions   Position[]
+  trades      Trade[]
+  createdAt   DateTime    @default(now())
+
+  @@unique([roomId, username])
+}
+
+model Position {
+  id          String @id @default(cuid())
+  userId      String
+  user        User   @relation(fields: [userId], references: [id])
+  symbol      String
+  qty         Float  @default(0)
+  avgEntry    Float  @default(0)
+  realizedPnl Float  @default(0)
+
+  @@unique([userId, symbol])
+}
+
+model Trade {
+  id         String   @id @default(cuid())
+  roomId     String
+  room       Room     @relation(fields: [roomId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  symbol     String
+  side       String
+  qty        Float
+  fillPrice  Float
+  feePaid    Float
+  createdAt  DateTime @default(now())
+}
+
+model EventLog {
+  id         String   @id @default(cuid())
+  roomId     String
+  room       Room     @relation(fields: [roomId], references: [id])
+  message    String
+  eventType  String
+  symbol     String?
+  createdAt  DateTime @default(now())
+}
+
+model LeaderboardSnapshot {
+  id        String   @id @default(cuid())
+  roomId    String
+  room      Room     @relation(fields: [roomId], references: [id])
+  payload   String
+  createdAt DateTime @default(now())
+}
