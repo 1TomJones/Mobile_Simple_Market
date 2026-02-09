@@ -63,7 +63,7 @@ export function App() {
 
   const joinRoom = () => {
     socket.emit('join_room', { username, roomCode }, (res: {ok: boolean; error?: string; portfolio?: {cash: number; positions: PositionView[]}; market?: MarketState[]; leaderboard?: LeaderboardRow[]; user?: {userId: string; username: string}}) => {
-      if (!res.ok) return setToast(res.error);
+      if (!res.ok) return setToast(res.error ?? 'Join failed');
       setJoined(true);
       if (!res.portfolio || !res.market || !res.leaderboard) return setToast('Malformed join payload');
       setCash(res.portfolio.cash);
@@ -79,7 +79,7 @@ export function App() {
 
   const placeOrder = () => {
     socket.emit('place_order', { symbol: selected, side, qty: Number(qty) }, (res: {ok: boolean; error?: string; fillPrice?: number; fee?: number; portfolio?: {cash: number; positions: PositionView[]}}) => {
-      if (!res.ok) return setToast(res.error);
+      if (!res.ok) return setToast(res.error ?? 'Order failed');
       if (!res.portfolio || res.fillPrice === undefined || res.fee === undefined) return setToast('Malformed order payload');
       setCash(res.portfolio.cash);
       setPositions(res.portfolio.positions);
@@ -105,7 +105,7 @@ export function App() {
 
   const broadcast = () => {
     socket.emit('admin_broadcast', { pin: adminPin, message: adminMessage }, (res: {ok: boolean; error?: string}) => {
-      setToast(res.ok ? 'Broadcast sent' : res.error);
+      setToast(res.ok ? 'Broadcast sent' : (res.error ?? 'Broadcast failed'));
       if (res.ok) setAdminMessage('');
     });
   };
